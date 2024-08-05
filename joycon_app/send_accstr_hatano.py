@@ -52,7 +52,7 @@ layout = [[sg.Text(' ')],
         [sg.Text('要求加速度'), sg.MLine(key='-ML_acc-'+sg.WRITE_ONLY_KEY, size=(10,1)),sg.Text('要求舵角'), sg.MLine(key='-ML_ang-'+sg.WRITE_ONLY_KEY, size=(10,1))],
         [sg.Text(' ')],
         [sg.Text('                  '),sg.B(" ← ", font=('Arial',15)),sg.B(' ↑ ', font=('Arial',15)),sg.B(' → ', font=('Arial',15))],
-        [sg.Text('                  '),sg.B(" R ", font=('Arial',17)),sg.B(' ↓ ', font=('Arial',15)),sg.B('緊急停止', font=('Arial',15))],
+        [sg.Text('     '),sg.B(" P ", font=('Arial',17)),sg.B(" R ", font=('Arial',17)),sg.B(' ↓ ', font=('Arial',15)),sg.B('緊急停止', font=('Arial',15))],
         [sg.Text(' ')],
         [sg.Text("port No"),sg.InputText("9000",key="port")],
         [sg.Button("ポート更新",key='change',size=(15,2),button_color = ('#ffffff','#000000'))],
@@ -68,6 +68,8 @@ tgt_str = 0
 
 adjust_acc = 0.2
 adjust_str = 1
+
+nogoflg = 0
 
 
 while True:
@@ -98,28 +100,35 @@ while True:
 
     elif event == ' → ':
         tgt_str = tgt_str - (1 * adjust_str)
+    
+    elif event == ' P ':
+        tgt_str = 0
+        tgt_acc = 0
+        send_message = "p"
+        nogoflg = 1
 
+    if nogoflg == 0:
 
-    if tgt_acc >= 0:
-        tgt_acc_adj = (tgt_acc * 1000)
-    elif tgt_acc < 0:
-        tgt_acc_adj = (-tgt_acc * 1000)+(2**15)
-    tgt_acc_hex = format(int(tgt_acc_adj), '04X')
-    send_data1 = int(tgt_acc_hex[0:2],16)
-    print("send_data1 : ",send_data1)
-    send_data2 = int(tgt_acc_hex[2:4],16)
+        if tgt_acc >= 0:
+            tgt_acc_adj = (tgt_acc * 1000)
+        elif tgt_acc < 0:
+            tgt_acc_adj = (-tgt_acc * 1000)+(2**15)
+        tgt_acc_hex = format(int(tgt_acc_adj), '04X')
+        send_data1 = int(tgt_acc_hex[0:2],16)
+        print("send_data1 : ",send_data1)
+        send_data2 = int(tgt_acc_hex[2:4],16)
 
-    if tgt_str >= 0:
-        tgt_str_adj = (tgt_str * 1000 * 3.14 / 180)
-    elif tgt_str < 0:
-        tgt_str_adj = (tgt_str * 1000 * 3.14 / 180 ) + ( 2**16 )
-    tgt_str_hex = format(int(tgt_str_adj), '04X')
-    send_data3 = int(tgt_str_hex[0:2],16)
-    send_data4 = int(tgt_str_hex[2:4],16)
+        if tgt_str >= 0:
+            tgt_str_adj = (tgt_str * 1000 * 3.14 / 180)
+        elif tgt_str < 0:
+            tgt_str_adj = (tgt_str * 1000 * 3.14 / 180 ) + ( 2**16 )
+        tgt_str_hex = format(int(tgt_str_adj), '04X')
+        send_data3 = int(tgt_str_hex[0:2],16)
+        send_data4 = int(tgt_str_hex[2:4],16)
 
-    print("send_data1 : ",send_data1)
-    #send_message = str(send_data1) + str(send_data2) + str(send_data3) + str(send_data4)
-    send_message = tgt_acc_hex + tgt_str_hex
+        print("send_data1 : ",send_data1)
+        #send_message = str(send_data1) + str(send_data2) + str(send_data3) + str(send_data4)
+        send_message = tgt_acc_hex + tgt_str_hex
     print(send_message + "  port:" + str(port))
     window['-ML_acc-'+sg.WRITE_ONLY_KEY].update(tgt_acc)
     window['-ML_ang-'+sg.WRITE_ONLY_KEY].update(tgt_str)
