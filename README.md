@@ -20,6 +20,10 @@
 #### ダウンロード
 ① VSCodeのターミナルを起動
 
+② ダウンロードしたいフォルダに移動
+```
+cd <ダウンロードしたいフォルダのリンク>
+```
 ② リモートのリポジトリをダウンロード
 ```
 git clone https://github.com/Yasuyoshi1118/RemoteControlbyJoycon.git
