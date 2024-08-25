@@ -6,6 +6,9 @@ import time
 import pygame
 from pygame.locals import *
 
+adjust_acc = 0.1
+adjust_str = 20
+
 def ReadConfigFile_func(x):
     i = 0
     y = []
@@ -66,7 +69,7 @@ def joycon_control():
         print ('joystickが見つかりませんでした。')
 
 def joycon():
-    global send_message, end_flg
+    global send_message, end_flg, adjust_acc, adjust_str
     pygame.joystick.init()
     joystick0 = pygame.joystick.Joystick(0)
     joystick0.init()
@@ -86,19 +89,19 @@ def joycon():
                 print ('button:' + str(e.button))
                 if int(e.button)==0:
                     print ('press up')
-                    tgt_accel += 1
+                    tgt_accel += 1 * adjust_acc
                     print("tgt_accel = ", tgt_accel)
                 elif int(e.button)==3:
                     print ('press down')
-                    tgt_accel -= 1
+                    tgt_accel -= 1 * adjust_acc
                     print("tgt_accel = ", tgt_accel)
                 elif int(e.button)==1:
                     print ('press right')
-                    tgt_str -= 1
+                    tgt_str -= 1 * adjust_str
                     print("tgt_str = ", tgt_str)
                 elif int(e.button)==2:
                     print ('press left')
-                    tgt_str += 1
+                    tgt_str += 1 * adjust_str
                     print("tgt_str = ", tgt_str)
                 elif int(e.button)==6:
                     print ('press +  -->  finish')
@@ -134,6 +137,8 @@ def change_int2hexMSG(tgt_acc,tgt_str):
     # str_data2 = int(tgt_str_hex[2:4],16)
     return_message = tgt_acc_hex + tgt_str_hex
     return return_message
+
+
 
 if __name__ == '__main__':
     print('start_program')
