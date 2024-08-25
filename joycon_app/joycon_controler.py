@@ -37,7 +37,7 @@ def tcp_send():
     Temp_list = ConfigFile_list[1].split(',')
     ip = Temp_list[0]
     port = int(Temp_list[1])
-    timeout = int(Temp_list[2])
+    timeout = float(Temp_list[2])
     while end_flg == 0:
       try:
           Socket1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #// AF_INET=IPv4, SOCK_STREAM=TCP/IP
@@ -66,6 +66,7 @@ def joycon_control():
         print ('joystickが見つかりませんでした。')
 
 def joycon():
+    global send_message, end_flg
     pygame.joystick.init()
     joystick0 = pygame.joystick.Joystick(0)
     joystick0.init()
@@ -103,11 +104,36 @@ def joycon():
                     print ('press +  -->  finish')
                     end_flg = 1
                     return
+                send_message = change_int2hexMSG(tgt_accel,tgt_str)
+                print("send_message_calc = ",send_message)
 
             elif e.type == pygame.locals.JOYAXISMOTION:
                 hat_x, hat_y = joystick0.get_axis(0), joystick0.get_axis(1)
                 if (abs(hat_x) > 0.3) or (abs(hat_y) > 0.3) :
                     print('hat x:' + str(hat_x) + ' hat y:' + str(hat_y))
+
+
+def change_int2hexMSG(tgt_acc,tgt_str):
+    #print("tgt_acc = ",tgt_acc)
+    if tgt_acc >= 0:
+        tgt_acc_adj = (tgt_acc * 1000)
+    elif tgt_acc < 0:
+        tgt_acc_adj = (-tgt_acc * 1000)+(2**15)
+    #print("tgt_acc_adj = ",tgt_acc_adj)
+    tgt_acc_hex = format(int(tgt_acc_adj), '04X')
+    # acc_data1 = int(tgt_acc_hex[0:2],16)
+    # acc_data2 = int(tgt_acc_hex[2:4],16)
+
+    if tgt_str >= 0:
+        tgt_str_adj = (tgt_str * 1000 * 3.14 / 180)
+    elif tgt_str < 0:
+        tgt_str_adj = (tgt_str * 1000 * 3.14 / 180 ) + ( 2**16 )
+    tgt_str_hex = format(int(tgt_str_adj), '04X')
+    # str_data1 = int(tgt_str_hex[0:2],16)
+    # #print("tgt_hex:",tgt_str_hex)
+    # str_data2 = int(tgt_str_hex[2:4],16)
+    return_message = tgt_acc_hex + tgt_str_hex
+    return return_message
 
 if __name__ == '__main__':
     print('start_program')
